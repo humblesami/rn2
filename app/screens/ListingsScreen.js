@@ -12,35 +12,41 @@ import AppText from '../components/AppText';
 import useApi from '../hooks/useApi';
 
 function ListingsScreen({ navigation }) {
-  const { data: listings, error, loading, request: loadListings } = useApi(listingsApi.getListings);
-  
-  useEffect(() => {
-    loadListings();
-  }, []);
+    const api_result = useApi(listingsApi.getListings);
+    let error = api_result.error;
+    if (api_result.data){
+        if(api_result.data.status == 'error'){
+            error = api_result.data.data;
+        }
+    }
+    const listings = api_result.data.data;
+    const loading = api_result.loading;
+    const loadListings = api_result.request;
 
- 
+    useEffect(() => {
+        loadListings();
+    }, []);
 
     return (
-      <Screen style={styles.screen}>
-        {error && (
-          <>
-          <AppText>Couldn't retrieve listings.</AppText>
-          <AppButton title="Retry" onPress={loadListings} />
-          </>
-        )}
-        <ActivityIndicator visible={loading} />
-        <FlatList 
-        data={listings}
-        keyExtractor={listing => listing.id.toString()}
-        renderItem={({ item }) => 
-            <Card 
-            title={item.title}
-            subTitle={"$" + item.price}
-            imageUrl={item.images[0].url}
-            onPress={() => navigation.navigate(routes.LISTING_DETAILS, item)}
+        <Screen style={styles.screen}>
+            {error && (
+                <>
+                    <AppText>Couldn't retrieve listings.</AppText>
+                    <AppButton title="Retry" onPress={loadListings} />
+                </>
+            )}
+            <ActivityIndicator visible={loading} />
+            <FlatList
+                data={listings}
+                keyExtractor={listing => listing.id.toString()}
+                renderItem={({ item }) =>
+                    <Card
+                        title={item.title}
+                        subTitle={"$" + item.price}
+                        onPress={() => navigation.navigate(routes.LISTING_DETAILS, item)}
+                    />
+                }
             />
-        }
-        />
         </Screen>
     )
 }
