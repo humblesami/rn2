@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet } from "react-native";
+import { FlatList, StyleSheet, TouchableOpacity } from "react-native";
 
 import ActivityIndicator from '../components/ActivityIndicator';
 import AppButton from '../components/AppButton'
@@ -10,8 +10,10 @@ import listingsApi from '../api/listings';
 import routes from '../navigation/routes';
 import AppText from '../components/AppText';
 import useApi from '../hooks/useApi';
+import NewListingButton from '../navigation/NewListingButton';
 
-function ListingsScreen({ navigation }) {
+
+function ListingsScreen({ navigation, route }) {
     const api_result = useApi(listingsApi.getListings);
     let error = api_result.error;
     if (api_result.data){
@@ -19,6 +21,23 @@ function ListingsScreen({ navigation }) {
             error = api_result.data.data;
         }
     }
+
+    function delete_item(item_id){
+        console.log('Item being deleted '+item_id);
+    }
+
+    const ListItemCard = ({ item }) => (
+        <TouchableOpacity>
+            <Card title={item.title} subTitle={"$" + item.price}/>
+            <NewListingButton onPress={() => navigation.navigate(routes.LISTING_EDIT, item)} />
+            <NewListingButton onPress={() => { delete_item(item.id) } } />
+        </TouchableOpacity>
+    );
+    const renderListItem = ({ item }) => (
+        <ListItemCard item={item} />
+    );
+
+
     const listings = api_result.data.data;
     const loading = api_result.loading;
     const loadListings = api_result.request;
@@ -39,13 +58,7 @@ function ListingsScreen({ navigation }) {
             <FlatList
                 data={listings}
                 keyExtractor={listing => listing.id.toString()}
-                renderItem={({ item }) =>
-                    <Card
-                        title={item.title}
-                        subTitle={"$" + item.price}
-                        onPress={() => navigation.navigate(routes.LISTING_EDIT, item)}
-                    />
-                }
+                renderItem={renderListItem}
             />
         </Screen>
     )

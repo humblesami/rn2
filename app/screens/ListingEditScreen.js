@@ -6,6 +6,7 @@ import AppFormField from "../components/forms/AppFormField";
 import SubmitButton from "../components/forms/SubmitButton";
 import AppForm from "../components/forms/Form";
 import AppFormPicker from '../components/forms/AppFormPicker'
+
 import Screen from "../components/Screen";
 import CategoryPickerItem from '../components/Picker/CategoryPickerItem';
 import FormImagePicker from "../components/forms/FormImagePicker";
@@ -79,13 +80,9 @@ const categories = [
     },
 ];
 
-function ListingEditScreen({ route }) {
-    const edit_item = route.params ? route.params : { id: '', price: '' };
-    // console.log(edit_item, 11);
-    const selected_cats = categories.filter(function (item) { return item.value == edit_item.categoryId });
-    const selected_category = selected_cats.length ? selected_cats[0] : null;
+function ListingEditScreen() {
     const location = useLocation();
-    const [uploadVisible] = useState(false);
+    const [uploadVisible, setUploadVisible] = useState(false);
     const [progress, setProgress] = useState(0);
 
     const handleSubmit = async (listing) => {
@@ -108,9 +105,9 @@ function ListingEditScreen({ route }) {
                 <UploadScreen progress={progress} visible={uploadVisible} />
                 <AppForm
                     initialValues={{
-                        title: edit_item.title,
-                        price: edit_item.price,
-                        description: edit_item.description,
+                        title: "",
+                        price: "",
+                        description: "",
                         category: null,
                         images: [],
                     }}
@@ -118,30 +115,17 @@ function ListingEditScreen({ route }) {
                     validationSchema={validationSchema}
                 >
                     <FormImagePicker name="images" />
-                    <AppFormField
-                        style={styles.hiddenInput}
-                        name="id"
-                        editable={false}
-                        value={edit_item.id.toString()}
-                    />
-                    <AppFormField
-                        maxLength={255}
-                        name="title"
-                        value={edit_item.title}
-                        placeholder="Title"
-                    />
+                    <AppFormField maxLength={255} name="title" placeholder="Title" />
                     <AppFormField
                         keyboardType="numeric"
                         maxLength={8}
                         name="price"
-                        value={edit_item.price.toString()}
                         placeholder="Price Of Item"
                         width={120}
                     />
                     <AppFormPicker
                         items={categories}
                         name="category"
-                        value={selected_category}
                         numberOfColumns={3}
                         PickerItemComponent={CategoryPickerItem}
                         placeholder="Category"
@@ -171,8 +155,5 @@ const styles = StyleSheet.create({
         marginTop: 50,
         marginBottom: 20,
     },
-    hiddenInput: {
-
-    }
 });
 export default ListingEditScreen;
