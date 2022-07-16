@@ -42,6 +42,8 @@ function ListingsScreen({ navigation, route }) {
     const loading = api_result.loading;
     const loadListings = api_result.request;
 
+    //console.log(111, listings);
+
     useEffect(() => {
         loadListings();
     }, []);

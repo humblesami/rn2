@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import { StyleSheet, Image } from "react-native";
 import * as Yup from "yup";
 
-import AppFormField from "../components/forms/AppFormField";
+import AppTextInput from "../components/AppTextInput";
 import SubmitButton from "../components/forms/SubmitButton";
 import AppForm from "../components/forms/Form";
 import AppFormPicker from '../components/forms/AppFormPicker'
-
 import Screen from "../components/Screen";
 import CategoryPickerItem from '../components/Picker/CategoryPickerItem';
 import FormImagePicker from "../components/forms/FormImagePicker";
@@ -80,13 +79,31 @@ const categories = [
     },
 ];
 
-function ListingEditScreen() {
+function ListingEditScreen({ navigation, route }) {
+    let edit_item = { price: '', title: '', id: '', description: '', images:[], category: null  };
+    if(route && route.params){
+        edit_item = route.params;
+    }
+    else{
+        if(!route){
+            route = { params: edit_item}
+        }
+
+        if(!route.params){
+            route.params = edit_item;
+        }
+    }
+
+    // console.log(edit_item, 11);
+    const selected_cats = categories.filter(function (item) { return item.value == edit_item.categoryId });
+    const selected_category = selected_cats.length ? selected_cats[0] : null;
+
     const location = useLocation();
     const [uploadVisible, setUploadVisible] = useState(false);
     const [progress, setProgress] = useState(0);
 
     const handleSubmit = async (listing) => {
-        console.log(listing, 111);
+        //console.log(listing, 111);
         // setUploadVisible(true);
 
         const result = await listingsApi.addListing({ ...listing, location }, (progress) => setProgress(progress));
@@ -105,9 +122,10 @@ function ListingEditScreen() {
                 <UploadScreen progress={progress} visible={uploadVisible} />
                 <AppForm
                     initialValues={{
-                        title: "",
-                        price: "",
-                        description: "",
+                        id: edit_item.id,
+                        title: edit_item.title,
+                        price: edit_item.price,
+                        description: edit_item.description,
                         category: null,
                         images: [],
                     }}
@@ -115,11 +133,24 @@ function ListingEditScreen() {
                     validationSchema={validationSchema}
                 >
                     <FormImagePicker name="images" />
-                    <AppFormField maxLength={255} name="title" placeholder="Title" />
-                    <AppFormField
+                    <AppTextInput
+                        style={styles.hiddenInput}
+                        name="id"
+                        editable={false}
+                        defaultValue={edit_item.id.toString()}
+                    />
+                    <AppTextInput
+                        maxLength={511}
+                        name="title"
+                        editable={true}
+                        defaultValue={edit_item.title}
+                        placeholder="Title"
+                    />
+                    <AppTextInput
                         keyboardType="numeric"
                         maxLength={8}
                         name="price"
+                        defaultValue={edit_item.price.toString()}
                         placeholder="Price Of Item"
                         width={120}
                     />
@@ -130,10 +161,11 @@ function ListingEditScreen() {
                         PickerItemComponent={CategoryPickerItem}
                         placeholder="Category"
                     />
-                    <AppFormField
-                        maxLength={255}
+                    <AppTextInput
+                        maxLength={1023}
                         multiline
                         name="description"
+                        defaultValue={edit_item.description}
                         numberOfLines={3}
                         placeholder="Description"
                     />
