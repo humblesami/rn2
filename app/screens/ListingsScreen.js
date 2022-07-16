@@ -43,7 +43,7 @@ function ListingsScreen({ navigation }) {
                     <Card
                         title={item.title}
                         subTitle={"$" + item.price}
-                        onPress={() => navigation.navigate(routes.LISTING_DETAILS, item)}
+                        onPress={() => navigation.navigate(routes.LISTING_EDIT, item)}
                     />
                 }
             />

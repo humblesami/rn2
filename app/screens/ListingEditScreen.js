@@ -80,7 +80,12 @@ const categories = [
     },
 ];
 
-function ListingEditScreen() {
+function ListingEditScreen({ route }) {
+    const edit_item = route.params;
+    console.log(11, route, edit_item, 22);
+    if(!edit_item){
+        edit_item = {};
+    }
     const location = useLocation();
     const [uploadVisible, setUploadVisible] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -106,9 +111,9 @@ function ListingEditScreen() {
                 <UploadScreen progress={progress} visible={uploadVisible} />
                 <AppForm
                     initialValues={{
-                        title: "",
-                        price: "",
-                        description: "",
+                        title: edit_item.title,
+                        price: edit_item.price,
+                        description: edit_item.description,
                         category: null,
                         images: [],
                     }}
@@ -116,11 +121,17 @@ function ListingEditScreen() {
                     validationSchema={validationSchema}
                 >
                     <FormImagePicker name="images" />
-                    <AppFormField maxLength={255} name="title" placeholder="Title" />
+                    <AppFormField
+                        maxLength={255}
+                        name="title"
+                        value={edit_item.title}
+                        placeholder="Title"
+                    />
                     <AppFormField
                         keyboardType="numeric"
                         maxLength={8}
                         name="price"
+                        value={edit_item.price.toString()}
                         placeholder="Price Of Item"
                         width={120}
                     />
